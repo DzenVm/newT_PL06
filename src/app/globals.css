@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+:root {
+  --color-ink: #0b0c10;
+  --color-ink-2: #14151b;
+  --color-ink-3: #1c1e26;
+  --color-gold: #cda861;
+  --color-gold-light: #ecd8a6;
+  --color-gold-deep: #8a6c33;
+  --color-ivory: #f4ecdc;
+  --color-emerald: #0e3c2f;
+  --color-emerald-light: #1c5c46;
+  --color-burgundy: #4c1626;
+  --color-burgundy-light: #7a2438;
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-2: var(--color-ink-2);
+  --color-ink-3: var(--color-ink-3);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-gold-deep: var(--color-gold-deep);
+  --color-ivory: var(--color-ivory);
+  --color-emerald: var(--color-emerald);
+  --color-emerald-light: var(--color-emerald-light);
+  --color-burgundy: var(--color-burgundy);
+  --color-burgundy-light: var(--color-burgundy-light);
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-manrope);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* Thin gold scrollbar, matches the Art Deco theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-deep);
+  border: 2px solid var(--color-ink);
+  border-radius: 6px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.deco-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold) 50%, transparent);
+}
+
+.deco-divider::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--color-gold);
+}
