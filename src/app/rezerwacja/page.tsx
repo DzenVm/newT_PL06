@@ -6,7 +6,7 @@ import { ReservationForm } from "./ReservationForm";
 export const metadata: Metadata = {
   title: "Rezerwacja",
   description:
-    "Zarezerwuj apartament, miejsce w prywatnym salonie gier (18+) lub wydarzenie w luksusowym obiekcie hotelowym w centrum Warszawy.",
+    "Zarezerwuj apartament, miejsce w kasynie hotelowym (18+) lub wydarzenie w luksusowym kasyno hotelu w centrum Warszawy.",
   alternates: { canonical: "/rezerwacja" },
 };
 

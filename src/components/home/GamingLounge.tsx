@@ -17,17 +17,18 @@ export function GamingLounge() {
         <div className="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <Reveal>
-              <p className="text-[13px] uppercase tracking-[0.3em] text-gold">Salon Gier · 18+</p>
+              <p className="text-[13px] uppercase tracking-[0.3em] text-gold">Kasyno Hotel · 18+</p>
               <h2 className="mt-4 font-display text-3xl text-ivory sm:text-4xl">
-                Prywatny salon gier karcianych w klimacie dawnego Las Vegas
+                Kasyno hotelowe i prywatny salon gier karcianych w klimacie dawnego Las Vegas
               </h2>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-ivory/65">
                 Kameralna sala z klasycznymi stołami do pokera, aksamitnymi
                 zasłonami, mosiężnymi żyrandolami i muzyką na żywo w weekendy.
-                Salon działa jako prywatny, licencjonowany obszar hotelu,
-                dostępny wyłącznie dla gości pełnoletnich, zgodnie z polskim
-                prawem regulującym urządzanie gier hazardowych. Szczegóły
-                licencji obiektu dostępne są na miejscu, w recepcji.
+                Nasze kasyno hotelowe działa jako prywatny, licencjonowany
+                obszar hotelu, dostępny wyłącznie dla gości pełnoletnich,
+                zgodnie z polskim prawem regulującym urządzanie gier
+                hazardowych. Szczegóły licencji obiektu dostępne są na
+                miejscu, w recepcji.
               </p>
             </Reveal>
 

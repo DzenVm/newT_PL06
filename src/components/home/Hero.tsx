@@ -21,13 +21,14 @@ export function Hero() {
           Warszawa · Śródmieście
         </p>
         <h1 className="mt-6 max-w-3xl font-display text-4xl leading-[1.1] text-ivory sm:text-6xl">
-          Prywatna rezydencja hotelowa z&nbsp;salonem gier w&nbsp;duchu dawnego
-          Las Vegas
+          Kasyno hotel w&nbsp;Warszawie — prywatna rezydencja z&nbsp;salonem
+          gier w&nbsp;duchu dawnego Las Vegas
         </h1>
         <p className="mt-6 max-w-xl text-base leading-relaxed text-ivory/75 sm:text-lg">
           Apartamenty premium, autorska kuchnia, spa z widokiem na miasto oraz
-          ekskluzywny, prywatny salon gier karcianych — wszystko w jednym
-          adresie w sercu Warszawy. Wyłącznie dla gości pełnoletnich.
+          ekskluzywne, prywatne kasyno hotelowe z salonem gier karcianych —
+          wszystko w jednym adresie w sercu Warszawy. Wyłącznie dla gości
+          pełnoletnich.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">

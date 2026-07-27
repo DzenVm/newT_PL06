@@ -2,6 +2,10 @@ import { Reveal } from "@/components/Reveal";
 
 const faqs = [
   {
+    q: "Czy to jest kasyno hotelowe?",
+    a: "Tak — obiekt to kasyno hotel: luksusowy hotel z prywatnym, licencjonowanym salonem gier karcianych działającym stacjonarnie na miejscu. Kasyno hotelowe dostępne jest wyłącznie dla gości pełnoletnich (18+) i funkcjonuje zgodnie z ustawą o grach hazardowych.",
+  },
+  {
     q: "Czy gry karciane są dostępne online, przez stronę?",
     a: "Nie. Strona ma charakter wyłącznie informacyjno-rezerwacyjny. Wszystkie gry odbywają się stacjonarnie, na terenie obiektu w Warszawie, w obecności personelu i pod nadzorem zgodnym z obowiązującymi przepisami. Nie oferujemy zakładów ani gier przez internet.",
   },

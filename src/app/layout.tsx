@@ -21,12 +21,15 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Luksusowy Hotel z Salonem Gier w Warszawie | Pobyt 5-gwiazdkowy",
-    template: "%s | Luksusowy Hotel i Salon Gier, Warszawa",
+    default: "Kasyno Hotel w Warszawie | Luksusowy Hotel z Salonem Gier",
+    template: "%s | Kasyno Hotel, Warszawa",
   },
   description:
-    "Prywatna rezydencja hotelowa w centrum Warszawy: apartamenty premium, autorska restauracja, spa oraz ekskluzywny salon gier karcianych w stylu dawnego Las Vegas. Wyłącznie dla gości 18+.",
+    "Kasyno hotel w centrum Warszawy: apartamenty premium, autorska restauracja, spa oraz ekskluzywny salon gier karcianych w stylu dawnego Las Vegas. Wyłącznie dla gości 18+.",
   keywords: [
+    "kasyno hotel",
+    "kasyno hotel Warszawa",
+    "hotel z kasynem Warszawa",
     "luksusowy hotel Warszawa",
     "apartamenty premium Warszawa",
     "salon gier karcianych Warszawa",
@@ -38,16 +41,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pl_PL",
     url: SITE_URL,
-    siteName: "Luksusowy Hotel i Salon Gier — Warszawa",
-    title: "Luksusowy Hotel z Salonem Gier w Warszawie",
+    siteName: "Kasyno Hotel — Warszawa",
+    title: "Kasyno Hotel w Warszawie | Luksusowy Hotel z Salonem Gier",
     description:
-      "Apartamenty premium, autorska kuchnia, spa i prywatny salon gier karcianych w sercu Warszawy. 18+.",
+      "Apartamenty premium, autorska kuchnia, spa i prywatne kasyno hotelowe w sercu Warszawy. 18+.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luksusowy Hotel z Salonem Gier w Warszawie",
+    title: "Kasyno Hotel w Warszawie | Luksusowy Hotel z Salonem Gier",
     description:
-      "Apartamenty premium, autorska kuchnia, spa i prywatny salon gier karcianych w sercu Warszawy. 18+.",
+      "Apartamenty premium, autorska kuchnia, spa i prywatne kasyno hotelowe w sercu Warszawy. 18+.",
   },
   robots: { index: true, follow: true },
 };
@@ -67,7 +70,7 @@ export default function RootLayout({
     "@type": "LodgingBusiness",
     url: SITE_URL,
     description:
-      "Prywatna rezydencja hotelowa w Warszawie z apartamentami premium, restauracją, spa oraz salonem gier karcianych dostępnym dla gości pełnoletnich.",
+      "Kasyno hotel w Warszawie — prywatna rezydencja hotelowa z apartamentami premium, restauracją, spa oraz salonem gier karcianych dostępnym dla gości pełnoletnich.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Warszawa",
@@ -76,7 +79,7 @@ export default function RootLayout({
     areaServed: "PL",
     priceRange: "$$$$",
     amenityFeature: [
-      { "@type": "LocationFeatureSpecification", name: "Salon gier karcianych (18+)", value: true },
+      { "@type": "LocationFeatureSpecification", name: "Kasyno hotelowe / salon gier karcianych (18+)", value: true },
       { "@type": "LocationFeatureSpecification", name: "Spa i basen", value: true },
       { "@type": "LocationFeatureSpecification", name: "Restauracja autorska", value: true },
       { "@type": "LocationFeatureSpecification", name: "Concierge 24/7", value: true },
