@@ -16,7 +16,7 @@ Warszawie z prywatnym salonem gier karcianych. Zbudowana pod domenę
   (`src/app/rezerwacja/actions.ts`).
 - **`next/og`** do dynamicznego generowania obrazu Open Graph
   (`src/app/opengraph-image.tsx`).
-- **`proxy.ts`** (następca `middleware.ts` w Next 16) ustawia nagłówki
+- **`src/proxy.ts`** (następca `middleware.ts` w Next 16) ustawia nagłówki
   bezpieczeństwa (CSP, X-Frame-Options, itd.).
 - Zero bibliotek ikon/animacji stron trzecich — cały zestaw ikon
   (`src/components/icons.tsx`) i animacje pojawiania się przy scrollu
