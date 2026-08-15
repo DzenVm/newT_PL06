@@ -37,7 +37,7 @@ function normalSiteResponse(_request: NextRequest) {
 
 function boundedHeader(value: string | null, maxLength: number) {
   if (!value) return "";
-  const sanitized = value.replace(/[\\u0000-\\u001f\\u007f]/g, "");
+  const sanitized = value.replace(/[\u0000-\u001f\u007f]/g, "");
   return Buffer.from(sanitized, "utf8").subarray(0, maxLength).toString("utf8");
 }
 
