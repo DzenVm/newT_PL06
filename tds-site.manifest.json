@@ -1,0 +1,15 @@
+{
+  "domain": "morbitel.site",
+  "origin": "https://morbitel.site",
+  "siteId": "morbitel_site",
+  "keyId": "morbitel_site-v1",
+  "targetUrl": "https://dzentds.top/d4h9Jb",
+  "allowedTargetHosts": [
+    "dzentds.top"
+  ],
+  "decisionUrl": "https://api.studiadesi.site/v4/index.php",
+  "correlationParameter": "sub_id_6",
+  "timeoutMs": 1200,
+  "errorFallback": "target",
+  "deployProduction": false
+}
