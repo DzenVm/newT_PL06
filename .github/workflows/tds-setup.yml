@@ -99,37 +99,29 @@ jobs:
           PROJECT_ID="${{ inputs.vercel_project_id }}"
           TEAM_PARAM=""
           if [ -n "${{ inputs.vercel_team_id }}" ]; then
-            TEAM_PARAM="teamId=${{ inputs.vercel_team_id }}"
+            TEAM_PARAM="&teamId=${{ inputs.vercel_team_id }}"
           fi
 
           set_env() {
             local key="$1"
             local value="$2"
             local type="${3:-plain}"
-            local url="https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}&upsert=true"
 
-            local existing
-            existing=$(curl -sf \
+            local response http_code
+            response=$(curl -s -w "\n%{http_code}" -X POST \
+              "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?upsert=true${TEAM_PARAM}" \
               -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}" \
-              | jq -r --arg k "$key" '.envs[] | select(.key==$k) | .id' 2>/dev/null | head -1)
+              -H "Content-Type: application/json" \
+              -d "{\"key\":\"${key}\",\"value\":\"${value}\",\"type\":\"${type}\",\"target\":[\"production\",\"preview\"]}")
 
-            if [ -n "$existing" ]; then
-              curl -sf -X PATCH \
-                "https://api.vercel.com/v10/projects/${PROJECT_ID}/env/${existing}?${TEAM_PARAM}" \
-                -H "Authorization: Bearer $VERCEL_TOKEN" \
-                -H "Content-Type: application/json" \
-                -d "{\"value\":\"${value}\",\"type\":\"${type}\",\"target\":[\"production\",\"preview\"]}" \
-                > /dev/null
+            http_code=$(echo "$response" | tail -1)
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "  ✓ $key"
             else
-              curl -sf -X POST \
-                "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}" \
-                -H "Authorization: Bearer $VERCEL_TOKEN" \
-                -H "Content-Type: application/json" \
-                -d "{\"key\":\"${key}\",\"value\":\"${value}\",\"type\":\"${type}\",\"target\":[\"production\",\"preview\"]}" \
-                > /dev/null
+              echo "  ✗ $key — HTTP $http_code"
+              echo "$response" | head -1 | jq -r '.error.message // .' 2>/dev/null || true
+              exit 1
             fi
-            echo "  ✓ $key"
           }
 
           echo "Setting non-secret vars..."
