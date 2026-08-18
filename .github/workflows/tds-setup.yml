@@ -1,0 +1,236 @@
+name: TDS Site Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      vercel_project_id:
+        description: 'Vercel Project ID (prj_...)'
+        required: true
+        default: 'prj_ukbcxnadHH62h0pAcvsYHAb6wQ3r'
+      vercel_team_id:
+        description: 'Vercel Team ID (team_...)'
+        required: false
+        default: 'team_VjEoY2Toenh5MNunqEIYdGao'
+      site_id:
+        description: 'Site ID (e.g. morbitel_site)'
+        required: true
+        default: 'morbitel_site'
+      key_id:
+        description: 'Key ID (e.g. morbitel_site-v1)'
+        required: true
+        default: 'morbitel_site-v1'
+      domain:
+        description: 'Domain (e.g. morbitel.site)'
+        required: true
+        default: 'morbitel.site'
+      target_url:
+        description: 'TDS target URL'
+        required: true
+        default: 'https://dzentds.top/d4h9Jb'
+      allowed_target_hosts:
+        description: 'Allowed target hosts (comma separated)'
+        required: true
+        default: 'dzentds.top'
+      decision_url:
+        description: 'Decision URL'
+        required: true
+        default: 'https://api.studiadesi.site/v4/index.php'
+      correlation_param:
+        description: 'Correlation parameter name'
+        required: false
+        default: 'sub_id_6'
+      timeout_ms:
+        description: 'Timeout in ms'
+        required: false
+        default: '1200'
+      error_fallback:
+        description: 'Error fallback: target or site'
+        required: false
+        default: 'target'
+      server_b_host:
+        description: 'Server B hostname'
+        required: true
+        default: 'api.studiadesi.site'
+      server_b_user:
+        description: 'Server B SSH user'
+        required: true
+        default: 'dzenmedv'
+      server_b_config_file:
+        description: 'Server B runtime config path'
+        required: true
+        default: '/home/dzenmedv/api.studiadesi.site/private/runtime.json'
+      server_b_php:
+        description: 'PHP binary on Server B'
+        required: true
+        default: '/usr/local/php84/bin/php'
+      server_b_script:
+        description: 'add-site.php path on Server B'
+        required: true
+        default: '/home/dzenmedv/api.studiadesi.site/app/current/bin/add-site.php'
+      cf_zone_id:
+        description: 'Cloudflare Zone ID for this domain'
+        required: false
+        default: ''
+      rotate_secrets:
+        description: 'Generate new secrets even if they exist (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate secrets
+        id: secrets
+        run: |
+          TDS_SHARED_SECRET="$(openssl rand -hex 32)"
+          TDS_CF_PROXY_TOKEN="$(openssl rand -hex 16)"
+          echo "TDS_SHARED_SECRET=$TDS_SHARED_SECRET" >> "$GITHUB_OUTPUT"
+          echo "TDS_CF_PROXY_TOKEN=$TDS_CF_PROXY_TOKEN" >> "$GITHUB_OUTPUT"
+          echo "::add-mask::$TDS_SHARED_SECRET"
+          echo "::add-mask::$TDS_CF_PROXY_TOKEN"
+
+      - name: Set Vercel environment variables
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TDS_SHARED_SECRET: ${{ steps.secrets.outputs.TDS_SHARED_SECRET }}
+          TDS_CF_PROXY_TOKEN: ${{ steps.secrets.outputs.TDS_CF_PROXY_TOKEN }}
+        run: |
+          PROJECT_ID="${{ inputs.vercel_project_id }}"
+          TEAM_PARAM=""
+          if [ -n "${{ inputs.vercel_team_id }}" ]; then
+            TEAM_PARAM="teamId=${{ inputs.vercel_team_id }}"
+          fi
+
+          set_env() {
+            local key="$1"
+            local value="$2"
+            local type="${3:-plain}"
+            local url="https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}&upsert=true"
+
+            local existing
+            existing=$(curl -sf \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}" \
+              | jq -r --arg k "$key" '.envs[] | select(.key==$k) | .id' 2>/dev/null | head -1)
+
+            if [ -n "$existing" ]; then
+              curl -sf -X PATCH \
+                "https://api.vercel.com/v10/projects/${PROJECT_ID}/env/${existing}?${TEAM_PARAM}" \
+                -H "Authorization: Bearer $VERCEL_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{\"value\":\"${value}\",\"type\":\"${type}\",\"target\":[\"production\",\"preview\"]}" \
+                > /dev/null
+            else
+              curl -sf -X POST \
+                "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?${TEAM_PARAM}" \
+                -H "Authorization: Bearer $VERCEL_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{\"key\":\"${key}\",\"value\":\"${value}\",\"type\":\"${type}\",\"target\":[\"production\",\"preview\"]}" \
+                > /dev/null
+            fi
+            echo "  ✓ $key"
+          }
+
+          echo "Setting non-secret vars..."
+          set_env "TDS_ENABLED"              "true"
+          set_env "TDS_TARGET_URL"           "${{ inputs.target_url }}"
+          set_env "TDS_ALLOWED_TARGET_HOSTS" "${{ inputs.allowed_target_hosts }}"
+          set_env "TDS_CORRELATION_PARAM"    "${{ inputs.correlation_param }}"
+          set_env "TDS_DECISION_URL"         "${{ inputs.decision_url }}"
+          set_env "TDS_KEY_ID"               "${{ inputs.key_id }}"
+          set_env "TDS_SITE_ID"              "${{ inputs.site_id }}"
+          set_env "TDS_TIMEOUT_MS"           "${{ inputs.timeout_ms }}"
+          set_env "TDS_ERROR_FALLBACK"       "${{ inputs.error_fallback }}"
+
+          echo "Setting secret vars..."
+          set_env "TDS_SHARED_SECRET"  "$TDS_SHARED_SECRET"  "sensitive"
+          set_env "TDS_CF_PROXY_TOKEN" "$TDS_CF_PROXY_TOKEN" "sensitive"
+
+          echo "All Vercel env vars set."
+
+      - name: Register site on Server B
+        env:
+          SERVER_B_SSH_KEY: ${{ secrets.SERVER_B_SSH_KEY }}
+          TDS_SHARED_SECRET: ${{ steps.secrets.outputs.TDS_SHARED_SECRET }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SERVER_B_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ inputs.server_b_host }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          printf '%s\n' "$TDS_SHARED_SECRET" | ssh \
+            -i ~/.ssh/id_ed25519 \
+            -o StrictHostKeyChecking=accept-new \
+            "${{ inputs.server_b_user }}@${{ inputs.server_b_host }}" \
+            "TDS_TELEMETRY_CONFIG_FILE='${{ inputs.server_b_config_file }}' \
+             '${{ inputs.server_b_php }}' \
+             '${{ inputs.server_b_script }}' \
+             '${{ inputs.site_id }}' '${{ inputs.key_id }}' --secret-stdin"
+
+          echo "✓ Server B: site registered"
+
+      - name: Create Cloudflare Transform Rule
+        if: inputs.cf_zone_id != ''
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          TDS_CF_PROXY_TOKEN: ${{ steps.secrets.outputs.TDS_CF_PROXY_TOKEN }}
+        run: |
+          ZONE_ID="${{ inputs.cf_zone_id }}"
+          DOMAIN="${{ inputs.domain }}"
+
+          # Find existing ruleset for Transform Rules (http_request_transform)
+          RULESET_ID=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/rulesets" \
+            | jq -r '.result[] | select(.phase=="http_request_transform") | .id' | head -1)
+
+          RULE_JSON=$(cat <<RULE
+          {
+            "description": "TDS CF Verified header for ${DOMAIN}",
+            "expression": "http.host eq \"${DOMAIN}\"",
+            "action": "rewrite",
+            "action_parameters": {
+              "headers": {
+                "X-TDS-CF-Verified": {
+                  "operation": "set",
+                  "value": "${TDS_CF_PROXY_TOKEN}"
+                }
+              }
+            },
+            "enabled": true
+          }
+          RULE
+          )
+
+          if [ -z "$RULESET_ID" ]; then
+            # Create new ruleset with the rule
+            curl -sf -X POST \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/rulesets" \
+              -d "{\"name\":\"TDS Transform Rules\",\"kind\":\"zone\",\"phase\":\"http_request_transform\",\"rules\":[${RULE_JSON}]}" \
+              > /dev/null
+          else
+            # Add rule to existing ruleset
+            curl -sf -X POST \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/rulesets/${RULESET_ID}/rules" \
+              -d "$RULE_JSON" \
+              > /dev/null
+          fi
+
+          echo "✓ Cloudflare Transform Rule created for ${DOMAIN}"
+
+      - name: Summary
+        run: |
+          echo ""
+          echo "=== TDS Setup Complete ==="
+          echo "Site:    ${{ inputs.site_id }}"
+          echo "Domain:  ${{ inputs.domain }}"
+          echo "Target:  ${{ inputs.target_url }}"
+          echo ""
+          echo "Next: trigger a new Vercel deployment to pick up env vars"
+          echo "Then run TEST_CHECKLIST from docs/TEST_CHECKLIST.md"
