@@ -147,13 +147,15 @@ jobs:
           TDS_SHARED_SECRET: ${{ steps.secrets.outputs.TDS_SHARED_SECRET }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SERVER_B_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$SERVER_B_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ inputs.server_b_host }}" >> ~/.ssh/known_hosts 2>/dev/null
 
           printf '%s\n' "$TDS_SHARED_SECRET" | ssh \
             -i ~/.ssh/id_ed25519 \
             -o StrictHostKeyChecking=accept-new \
+            -o ConnectTimeout=15 \
+            -v \
             "${{ inputs.server_b_user }}@${{ inputs.server_b_host }}" \
             "TDS_TELEMETRY_CONFIG_FILE='${{ inputs.server_b_config_file }}' \
              '${{ inputs.server_b_php }}' \
