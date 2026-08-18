@@ -146,15 +146,22 @@ jobs:
           SERVER_B_SSH_KEY: ${{ secrets.SERVER_B_SSH_KEY }}
           TDS_SHARED_SECRET: ${{ steps.secrets.outputs.TDS_SHARED_SECRET }}
         run: |
+          echo "Preparing SSH key..."
           mkdir -p ~/.ssh
           printf '%s\n' "$SERVER_B_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ inputs.server_b_host }}" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Key size: $(wc -c < ~/.ssh/id_ed25519) bytes"
+          ssh-keygen -l -f ~/.ssh/id_ed25519 || echo "WARNING: key file does not look like a valid private key"
 
+          echo "Probing host reachability..."
+          ssh-keyscan -T 10 -H "${{ inputs.server_b_host }}" >> ~/.ssh/known_hosts 2>&1 || echo "WARNING: ssh-keyscan failed (host may be firewalled or unreachable from this runner) — continuing anyway"
+
+          echo "Connecting via SSH..."
           printf '%s\n' "$TDS_SHARED_SECRET" | ssh \
             -i ~/.ssh/id_ed25519 \
             -o StrictHostKeyChecking=accept-new \
             -o ConnectTimeout=15 \
+            -o BatchMode=yes \
             -v \
             "${{ inputs.server_b_user }}@${{ inputs.server_b_host }}" \
             "TDS_TELEMETRY_CONFIG_FILE='${{ inputs.server_b_config_file }}' \
